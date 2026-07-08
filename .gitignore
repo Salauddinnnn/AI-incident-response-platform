@@ -1,0 +1,29 @@
+# Virtual Environment
+venv/
+.env
+
+# Python Cache
+__pycache__/
+*.pyc
+
+# Database
+data/incidents.db
+*.db
+*.sqlite3
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Docker Volumes
+prometheus_data/
+grafana_data/
+
+# Pytest
+.pytest_cache/
