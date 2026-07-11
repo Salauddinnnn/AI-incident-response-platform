@@ -1,42 +1,27 @@
-from openai import OpenAI
-from config import OPENROUTER_API_KEY
+import os
+from google import genai
 
-
-client = OpenAI(
-    base_url="https://openrouter.ai/api/v1",
-    api_key=OPENROUTER_API_KEY
+client = genai.Client(
+    api_key=os.getenv("GEMINI_API_KEY")
 )
 
-MODEL_NAME = "deepseek/deepseek-chat-v3.1"
+MODEL_NAME = "gemini-2.5-flash"
 
 
 def _ask_ai(prompt: str) -> str:
-    """
-    Send a prompt to the AI model and return the response.
-    """
-
     try:
-        response = client.chat.completions.create(
+        response = client.models.generate_content(
             model=MODEL_NAME,
-            messages=[
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ]
+            contents=prompt
         )
 
-        return response.choices[0].message.content
+        return response.text
 
-    except Exception as error:
-        return f"AI analysis unavailable: {error}"
+    except Exception as e:
+        return f"AI analysis unavailable: {e}"
 
 
 def analyze_incident_with_ai(incident_data):
-    """
-    Analyze website incidents using AI.
-    """
-
     prompt = f"""
 You are a Senior DevOps Site Reliability Engineer.
 
@@ -63,10 +48,6 @@ Keep the response short and practical.
 
 
 def analyze_generic_incident(title, details):
-    """
-    Analyze any infrastructure incident.
-    """
-
     prompt = f"""
 You are a Senior DevOps Site Reliability Engineer.
 
