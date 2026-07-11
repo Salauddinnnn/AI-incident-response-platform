@@ -13,3 +13,13 @@ services:
      - "3000:3000"
     depends_on:
       - prometheus
+  flask:
+    build: .
+    container_name: ai-flask
+    ports:
+      - "5001:5001"
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
