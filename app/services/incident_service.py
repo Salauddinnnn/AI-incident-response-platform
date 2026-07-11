@@ -2,43 +2,52 @@ from database.db import get_db_connection
 
 
 def create_incident(title, severity, ai_summary):
-    conn = get_db_connection()
-    cursor = conn.cursor()
+    with get_db_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                """
+                INSERT INTO incidents (
+                    title,
+                    severity,
+                    ai_summary
+                )
+                VALUES (%s, %s, %s)
+                """,
+                (title, severity, ai_summary)
+            )
 
-    cursor.execute("""
-        INSERT INTO incidents (title, severity, ai_summary)
-        VALUES (?, ?, ?)
-    """, (title, severity, ai_summary))
-
-    conn.commit()
-    conn.close()
+        conn.commit()
 
 
 def get_all_incidents():
-    conn = get_db_connection()
-    cursor = conn.cursor()
+    with get_db_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT
+                    id,
+                    title,
+                    severity,
+                    status,
+                    ai_summary,
+                    created_at
+                FROM incidents
+                ORDER BY id DESC
+                """
+            )
 
-    cursor.execute("""
-        SELECT id, title, severity, status, ai_summary, created_at
-        FROM incidents
-        ORDER BY id DESC
-    """)
-
-    incidents = cursor.fetchall()
-    conn.close()
-
-    return incidents
+            return cursor.fetchall()
 
 
 def resolve_open_incidents():
-    conn = get_db_connection()
-    cursor = conn.cursor()
+    with get_db_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                """
+                UPDATE incidents
+                SET status = 'resolved'
+                WHERE status = 'open'
+                """
+            )
 
-    cursor.execute("""
-        UPDATE incidents
-        SET status = 'resolved'
-        WHERE status = 'open'
-    """)
-
-    conn.commit()
-    conn.close()
+        conn.commit()

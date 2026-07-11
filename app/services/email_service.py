@@ -8,13 +8,33 @@ SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
 
 
-def send_incident_email(subject, body):
+def send_incident_email(incident):
     """
-    Send an incident notification email.
+    Send AI Incident Alert Email
     """
+
+    subject = f"🚨 {incident['severity'].upper()} Incident - {incident['title']}"
+
+    body = f"""
+AI INCIDENT RESPONSE PLATFORM
+
+Incident:
+{incident['title']}
+
+Severity:
+{incident['severity']}
+
+Status:
+{incident['status']}
+
+AI Analysis:
+
+{incident['ai_summary']}
+
+Generated Automatically by AI Incident Response Platform
+"""
 
     message = MIMEMultipart()
-
     message["From"] = EMAIL_USER
     message["To"] = ALERT_EMAIL
     message["Subject"] = subject
@@ -32,10 +52,9 @@ def send_incident_email(subject, body):
                 message.as_string()
             )
 
-        print("✅ Email Alert Sent Successfully")
-
+        print("Email Alert Sent")
         return True
 
-    except Exception as error:
-        print(f"❌ Email Error: {error}")
+    except Exception as e:
+        print(e)
         return False

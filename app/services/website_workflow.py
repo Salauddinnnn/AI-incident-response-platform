@@ -22,49 +22,46 @@ def run_website_workflow():
 
     if result["status"] in ["slow", "down"]:
         if not ALERT_STATE["is_incident_active"]:
+            title = f"{MONITOR_NAME} Website {result['status'].upper()}"
+
             ai_summary = analyze_incident_with_ai(result)
             heal_summary = "\n".join(run_auto_heal())
 
+            complete_summary = (
+                f"{ai_summary}\n\n"
+                f"Auto-Healing Actions:\n{heal_summary}"
+            )
+
             create_incident(
-                title=f"{MONITOR_NAME} Website {result['status'].upper()}",
+                title=title,
                 severity=result["severity"],
-                ai_summary=f"{ai_summary}\n\nAuto-Healing Actions:\n{heal_summary}"
+                ai_summary=complete_summary
             )
 
-            send_incident_email(
-                subject=f"[{result['severity'].upper()}] {MONITOR_NAME} Incident",
-                body=f"""Website: {result['url']}
-
-Status: {result['status']}
-Severity: {result['severity']}
-Status Code: {result['status_code']}
-Response Time: {result['response_time_seconds']} sec
-
-AI Analysis:
-
-{ai_summary}
-
-Auto-Healing Report:
-
-{heal_summary}
-"""
-            )
+            send_incident_email({
+                "title": title,
+                "severity": result["severity"],
+                "status": result["status"],
+                "ai_summary": complete_summary
+            })
 
             ALERT_STATE["is_incident_active"] = True
 
     else:
         if ALERT_STATE["is_incident_active"]:
-            send_incident_email(
-                subject=f"[RECOVERED] {MONITOR_NAME}",
-                body=f"""{MONITOR_NAME} is healthy again.
-
-Website: {result['url']}
-Status: {result['status']}
-Response Time: {result['response_time_seconds']} sec
-"""
-            )
-
             resolve_open_incidents()
+
+            send_incident_email({
+                "title": f"{MONITOR_NAME} Website Recovered",
+                "severity": "normal",
+                "status": "resolved",
+                "ai_summary": (
+                    f"{MONITOR_NAME} is healthy again.\n\n"
+                    f"Website: {result['url']}\n"
+                    f"Response Time: "
+                    f"{result['response_time_seconds']} sec"
+                )
+            })
 
         ALERT_STATE["is_incident_active"] = False
 

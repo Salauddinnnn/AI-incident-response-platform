@@ -1,7 +1,8 @@
 from flask import Blueprint, jsonify
 
+from database.db import get_db_connection
 from services.incident_workflow import run_incident_workflow
-from services.monitoring_service import get_server_metrics, check_ssl_expiry
+from services.monitoring_service import check_ssl_expiry, get_server_metrics
 from settings import MONITOR_NAME, MONITOR_URL
 
 
@@ -21,15 +22,50 @@ def check_website():
 
 @monitoring_bp.route("/server-metrics")
 def server_metrics():
-    metrics = get_server_metrics()
-    return jsonify(metrics)
+    return jsonify(get_server_metrics())
 
 
 @monitoring_bp.route("/ssl-check")
 def ssl_check():
     hostname = get_hostname_from_url(MONITOR_URL)
-    ssl_info = check_ssl_expiry(hostname)
-    return jsonify(ssl_info)
+    return jsonify(check_ssl_expiry(hostname))
+
+
+@monitoring_bp.route("/incidents")
+def incident_history():
+    with get_db_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute("""
+                SELECT
+                    id,
+                    title,
+                    severity,
+                    status,
+                    ai_summary,
+                    created_at
+                FROM incidents
+                ORDER BY created_at DESC
+                LIMIT 100
+            """)
+
+            rows = cursor.fetchall()
+
+    incidents = [
+        {
+            "id": row[0],
+            "title": row[1],
+            "severity": row[2],
+            "status": row[3],
+            "ai_summary": row[4],
+            "created_at": row[5].isoformat() if row[5] else None
+        }
+        for row in rows
+    ]
+
+    return jsonify({
+        "total": len(incidents),
+        "incidents": incidents
+    })
 
 
 @monitoring_bp.route("/status")

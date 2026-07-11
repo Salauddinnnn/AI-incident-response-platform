@@ -1,18 +1,16 @@
 import os
 from google import genai
+from config import GEMINI_API_KEY
+client = genai.Client(api_key=GEMINI_API_KEY)
 
-client = genai.Client(
-    api_key=os.getenv("GEMINI_API_KEY")
-)
-
-MODEL_NAME = "gemini-2.5-flash"
+MODEL_NAME = "gemini-3.5-flash"
 
 
 def _ask_ai(prompt: str) -> str:
     try:
         response = client.models.generate_content(
             model=MODEL_NAME,
-            contents=prompt
+            contents=prompt,
         )
 
         return response.text
