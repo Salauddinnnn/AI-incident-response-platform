@@ -1,7 +1,7 @@
 import os
 from datetime import datetime, timedelta, timezone
 from functools import wraps
-
+from flask_cors import CORS
 import jwt
 from flask import Flask, g, jsonify, request
 from prometheus_client import Counter, Gauge, generate_latest
@@ -15,6 +15,7 @@ from settings import MONITOR_URL, REQUEST_TIMEOUT, SLOW_THRESHOLD
 
 
 app = Flask(__name__)
+CORS(app, origins=["http://localhost:5173"])
 app.register_blueprint(monitoring_bp)
 
 
