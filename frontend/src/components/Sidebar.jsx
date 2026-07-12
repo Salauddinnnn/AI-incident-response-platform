@@ -9,15 +9,49 @@ import {
   BarChart3,
 } from "lucide-react";
 
+import { NavLink } from "react-router-dom";
+
 const menu = [
-  { icon: LayoutDashboard, label: "Dashboard" },
-  { icon: Activity, label: "Incidents" },
-  { icon: Globe, label: "Website Monitor" },
-  { icon: Server, label: "Server Monitor" },
-  { icon: ShieldAlert, label: "AI Analysis" },
-  { icon: Lock, label: "SSL Monitor" },
-  { icon: BarChart3, label: "Reports" },
-  { icon: Settings, label: "Settings" },
+  {
+    icon: LayoutDashboard,
+    label: "Dashboard",
+    path: "/",
+  },
+  {
+    icon: Activity,
+    label: "Incidents",
+    path: "/incidents",
+  },
+  {
+    icon: Globe,
+    label: "Website Monitor",
+    path: "/websites",
+  },
+  {
+    icon: Server,
+    label: "Infrastructure",
+    path: "/infrastructure",
+  },
+  {
+    icon: ShieldAlert,
+    label: "AI Analysis",
+    path: "/ai-analysis",
+  },
+  {
+    icon: Lock,
+    label: "SSL Monitor",
+    path: "/ssl",
+  },
+  {
+    icon: BarChart3,
+    label: "Reports",
+    path: "/reports",
+  },
+  {
+    icon: Settings,
+    label: "Settings",
+    path: "/settings",
+  },
 ];
 
 export default function Sidebar() {
@@ -32,13 +66,20 @@ export default function Sidebar() {
           const Icon = item.icon;
 
           return (
-            <button
+            <NavLink
               key={item.label}
-              className="flex items-center gap-3 w-full px-4 py-3 rounded-xl hover:bg-slate-800 transition"
+              to={item.path}
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-4 py-3 rounded-xl transition ${
+                  isActive
+                    ? "bg-blue-600"
+                    : "hover:bg-slate-800"
+                }`
+              }
             >
               <Icon size={20} />
               <span>{item.label}</span>
-            </button>
+            </NavLink>
           );
         })}
       </div>

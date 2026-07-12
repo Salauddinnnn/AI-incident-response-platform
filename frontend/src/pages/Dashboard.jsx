@@ -6,11 +6,32 @@ import {
 } from "lucide-react";
 import IncidentTable from "../components/IncidentTable";
 import StatCard from "../components/StatCard";
+import { useEffect, useState } from "react";
+import AIAnalysisCard from "../components/AIAnalysisCard";
+import WebsiteStatus from "../components/WebsiteStatus";
+import PerformanceChart from "../components/PerformanceChart";
 import useDashboard from "../hooks/useDashboard";
 
 export default function Dashboard() {
   const { data, isLoading, isError } = useDashboard();
+const [performanceData, setPerformanceData] = useState([]);
 
+useEffect(() => {
+  if (!data?.metrics) return;
+
+  const point = {
+    time: new Date().toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }),
+    cpu: Math.round(data.metrics.cpu_percent || 0),
+    ram: Math.round(data.metrics.ram_percent || 0),
+    disk: Math.round(data.metrics.disk_percent || 0),
+  };
+
+  setPerformanceData((current) => [...current.slice(-9), point]);
+}, [data?.metrics]);
   if (isLoading) {
     return <p className="text-slate-500">Loading dashboard...</p>;
   }
@@ -59,6 +80,9 @@ export default function Dashboard() {
         />
       </div>
       <IncidentTable incidents={incidents.slice(0, 5)} />
+      <PerformanceChart data={performanceData} />
+      <WebsiteStatus health={data?.health} />
+      <AIAnalysisCard incidents={incidents} />
     </div>
   );
 }
