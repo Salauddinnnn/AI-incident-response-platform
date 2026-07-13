@@ -32,14 +32,15 @@ Status Code: {incident_data.get("status_code")}
 Response Time: {incident_data.get("response_time_seconds")}
 Error: {incident_data.get("error")}
 
-Provide:
+Provide exactly these 4 lines:
 
-1. Root Cause
-2. Business Impact
-3. Immediate Action
-4. Long-Term Prevention
+Root Cause: one short professional sentence.
+Business Impact: one short professional sentence.
+Immediate Action: one short professional sentence.
+Prevention: one short professional sentence.
 
-Keep the response short and practical.
+Do not use markdown, headings, bullets, numbering, assumptions, or extra explanation.
+Each line must contain no more than 18 words.
 """
 
     return _ask_ai(prompt)
@@ -57,14 +58,15 @@ Incident:
 Details:
 {details}
 
-Provide:
+Provide exactly these 4 lines:
 
-1. Root Cause
-2. Business Impact
-3. Immediate Action
-4. Long-Term Prevention
+Root Cause: one short professional sentence.
+Business Impact: one short professional sentence.
+Immediate Action: one short professional sentence.
+Prevention: one short professional sentence.
 
-Keep the response short and practical.
+Do not use markdown, headings, bullets, numbering, assumptions, or extra explanation.
+Each line must contain no more than 18 words.
 """
 
     return _ask_ai(prompt)

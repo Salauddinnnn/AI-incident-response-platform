@@ -3,6 +3,9 @@ import {
   Globe,
   Server,
   Sparkles,
+  AlertTriangle,
+  CheckCircle,
+  XCircle,
 } from "lucide-react";
 import IncidentTable from "../components/IncidentTable";
 import StatCard from "../components/StatCard";
@@ -14,24 +17,25 @@ import useDashboard from "../hooks/useDashboard";
 
 export default function Dashboard() {
   const { data, isLoading, isError } = useDashboard();
-const [performanceData, setPerformanceData] = useState([]);
+  const [performanceData, setPerformanceData] = useState([]);
 
-useEffect(() => {
-  if (!data?.metrics) return;
+  useEffect(() => {
+    if (!data?.metrics) return;
 
-  const point = {
-    time: new Date().toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    }),
-    cpu: Math.round(data.metrics.cpu_percent || 0),
-    ram: Math.round(data.metrics.ram_percent || 0),
-    disk: Math.round(data.metrics.disk_percent || 0),
-  };
+    const point = {
+      time: new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      }),
+      cpu: Math.round(data.metrics.cpu_percent || 0),
+      ram: Math.round(data.metrics.ram_percent || 0),
+      disk: Math.round(data.metrics.disk_percent || 0),
+    };
 
-  setPerformanceData((current) => [...current.slice(-9), point]);
-}, [data?.metrics]);
+    setPerformanceData((current) => [...current.slice(-19), point]);
+  }, [data?.metrics]);
+
   if (isLoading) {
     return <p className="text-slate-500">Loading dashboard...</p>;
   }
@@ -40,49 +44,58 @@ useEffect(() => {
     return <p className="text-red-600">Backend connection failed.</p>;
   }
 
-  const incidents = data?.incidents?.incidents || [];
-  const openIncidents = incidents.filter(
-    (item) => item.status === "open"
-  ).length;
-
-  const websiteStatus =
-    data?.health?.status?.toUpperCase() || "UNKNOWN";
+  const stats = data?.stats || {};
+  const recentIncidents = data?.recent_incidents || [];
+  const websites = data?.websites || [];
 
   return (
     <div>
       <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
         <StatCard
-          title="Active Incidents"
-          value={openIncidents}
-          subtitle={`${incidents.length} total incidents`}
-          icon={Activity}
-        />
-
-        <StatCard
-          title="Website Status"
-          value={websiteStatus}
-          subtitle="Live health check"
+          title="Total Websites"
+          value={stats.total_websites || 0}
+          subtitle={`${stats.healthy || 0} healthy • ${stats.slow || 0} slow • ${stats.down || 0} down`}
           icon={Globe}
         />
 
         <StatCard
-        title="Server Health"
-        value={`${Math.round(data?.metrics?.cpu_percent || 0)}% CPU`}
-        subtitle={`RAM ${Math.round(data?.metrics?.ram_percent || 0)}% • Disk ${Math.round(data?.metrics?.disk_percent || 0)}%`}
-        icon={Server}
-      />
+          title="Open Incidents"
+          value={stats.open_incidents || 0}
+          subtitle={`${stats.critical_incidents || 0} critical • ${stats.total_incidents || 0} total`}
+          icon={AlertTriangle}
+        />
 
         <StatCard
-          title="AI Analysis"
-          value="Ready"
-          subtitle="Gemini AI connected"
-          icon={Sparkles}
+          title="Server Health"
+          value={`${Math.round(data?.metrics?.cpu_percent || 0)}% CPU`}
+          subtitle={`RAM ${Math.round(data?.metrics?.ram_percent || 0)}% • Disk ${Math.round(data?.metrics?.disk_percent || 0)}%`}
+          icon={Server}
+        />
+
+        <StatCard
+          title="Avg Response Time"
+          value={stats.avg_response_time ? `${stats.avg_response_time}s` : "N/A"}
+          subtitle="Across all websites"
+          icon={Activity}
         />
       </div>
-      <IncidentTable incidents={incidents.slice(0, 5)} />
-      <PerformanceChart data={performanceData} />
-      <WebsiteStatus health={data?.health} />
-      <AIAnalysisCard incidents={incidents} />
+
+      <div className="mt-6 grid gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <PerformanceChart data={performanceData} />
+        </div>
+        <div>
+          <WebsiteStatus websites={websites} />
+        </div>
+      </div>
+
+      <div className="mt-6">
+        <IncidentTable incidents={recentIncidents} />
+      </div>
+
+      <div className="mt-6">
+        <AIAnalysisCard incidents={recentIncidents} />
+      </div>
     </div>
   );
 }

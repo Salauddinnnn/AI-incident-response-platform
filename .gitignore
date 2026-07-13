@@ -27,3 +27,21 @@ grafana_data/
 
 # Pytest
 .pytest_cache/
+
+# Node
+node_modules/
+
+# Frontend Build
+frontend/dist/
+
+# IDE
+.idea/
+*.swp
+*.swo
+
+# OS
+*.pyo
+.env.local
+*.egg-info/
+dist/
+build/

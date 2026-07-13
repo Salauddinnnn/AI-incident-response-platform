@@ -5,18 +5,9 @@ export default function useDashboard() {
   return useQuery({
     queryKey: ["dashboard"],
     queryFn: async () => {
-      const [incidents, health, metrics] = await Promise.all([
-        api.get("/incidents"),
-        api.get("/health-check"),
-        api.get("/server-metrics"),
-      ]);
-
-      return {
-        incidents: incidents.data,
-        health: health.data,
-        metrics: metrics.data,
-      };
+      const response = await api.get("/dashboard");
+      return response.data;
     },
-    refetchInterval: 10000,
+    refetchInterval: 15000,
   });
 }

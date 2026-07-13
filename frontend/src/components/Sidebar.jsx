@@ -56,7 +56,7 @@ const menu = [
 
 export default function Sidebar() {
   return (
-    <aside className="w-64 h-screen bg-slate-900 text-white p-6">
+    <aside className="hidden h-screen w-64 bg-slate-900 p-6 text-white lg:block">
       <h1 className="text-2xl font-bold mb-10">
         AI Incident
       </h1>
