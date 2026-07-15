@@ -30,6 +30,10 @@ def run_website_workflow_for_website(website):
     if not is_active:
         return None
 
+    if not user_id:
+        logger.warning(f"Skipping website {name} ({url}) - no user_id assigned")
+        return None
+
     try:
         result = check_website_health(
             url=url,
