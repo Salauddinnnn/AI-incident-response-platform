@@ -46,6 +46,7 @@ export default function Dashboard() {
 
   const stats = data?.stats || {};
   const recentIncidents = data?.recent_incidents || [];
+  const allIncidents = data?.recent_incidents || [];
   const websites = data?.websites || [];
 
   return (
